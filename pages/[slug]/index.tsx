@@ -1,7 +1,8 @@
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import { pingbin } from '@/utils/pingBin'
-import Link from 'next/link'
+import { GetStaticPaths, GetStaticProps } from 'next';
+import { pingbin } from '@/utils/pingBin';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -36,6 +37,7 @@ export default function Home() {
       </div>
 
       <div className='grid gap-3'>
+      <Link href={'/'}>home</Link>
 <Link href={'/2023'}>page 1</Link>
         <Link href={'/blizzard'}>page 2</Link>
         <Link href={'/candy'}>page 3</Link>
@@ -115,8 +117,21 @@ export default function Home() {
   )
 }
 
+export const getStaticPaths: GetStaticPaths = async () => {
+	const paths = [
+		{ params: { slug: 'candy' } },
+		{ params: { slug: 'blizzard' } },
+		{ params: { slug: 'ea' } },
+		{ params: { slug: '2023' } },
+	];
+	return {
+		paths,
+		fallback: 'blocking',
+	};
+};
 
-export const getStaticProps = (async () => {
-  await pingbin('index')
+export const getStaticProps: GetStaticProps = (async (context) => {
+  const slug = context.params?.slug       
+  await pingbin(`${slug}`)
   return { props: { item:'test'},revalidate: 60*15 }
 })
